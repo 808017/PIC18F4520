@@ -1,0 +1,155 @@
+#include <p18f4520.h>
+
+#define lcd_data PORTD      // Data pins connected to PORTD
+#define rs PORTCbits.RC5    // Register Select pin
+#define rw PORTCbits.RC6    // Read/Write pin
+#define en PORTCbits.RC7    // Enable pin
+
+void lcdcmd(unsigned char value);
+void lcddata(unsigned char value);
+void MSDelay(unsigned int iteam);
+
+void main() {
+    // Set PORTD and PORTB as output
+    TRISD = 0; 
+    TRISC = 0;
+
+    // Initial state
+    en = 0;
+    MSDelay(250);
+
+    // LCD initialization
+    lcdcmd(0x30); // 8-bit mode, 1-line display
+    MSDelay(250);
+    lcdcmd(0x0E); // Display ON, cursor ON
+    MSDelay(15);
+    lcdcmd(0x01); // Clear display
+    MSDelay(15);
+    lcdcmd(0x80); // Set cursor to position
+    MSDelay(15);
+    lcdcmd(0x0F);
+    MSDelay(15);
+
+    // Write data to LCD
+    lcddata('A');
+    MSDelay(400);
+    lcddata('N');
+    MSDelay(400);
+    lcddata('I');
+    MSDelay(400);
+    lcddata('R');
+    MSDelay(400);
+    lcddata('U');
+    MSDelay(400);
+    lcddata('D');
+    MSDelay(400);
+    lcddata('H');
+    MSDelay(400);
+    lcddata('_');
+    MSDelay(400);
+    lcddata('L');
+    MSDelay(400);
+    lcddata('O');
+    MSDelay(400);
+    lcddata('V');
+    MSDelay(400);
+    lcddata('E');
+    MSDelay(400);
+    lcddata('_');
+    MSDelay(400);
+    lcddata('S');
+    MSDelay(400);
+    lcddata('.');
+    MSDelay(400);
+    lcddata('.');
+    MSDelay(400);
+ 
+ 
+
+
+    lcdcmd(0x30);
+    MSDelay(200);
+
+    lcdcmd(0x0E); // Display ON, cursor ON
+    MSDelay(200);
+
+    lcdcmd(0x01); // Clear display
+    MSDelay(200);
+
+    lcdcmd(0x80);
+    MSDelay(15);
+
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200); 
+    lcddata('.');
+    MSDelay(600);
+  
+   
+
+    lcddata('[');
+    MSDelay(400);
+
+    lcddata('Y');
+    MSDelay(400);
+
+    lcddata('M');
+    MSDelay(400);
+
+ 
+    lcddata(']');
+    MSDelay(400);
+
+    lcddata('.');
+    MSDelay(600);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200); 
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+    lcddata('.');
+    MSDelay(200);
+   
+  
+
+   
+
+    while (1); // Infinite loop
+}
+
+void lcdcmd(unsigned char value) {
+    lcd_data = value; // Send command
+    rs = 0;           // Command mode
+    rw = 0;           // Write mode
+    en = 1;           // Generate enable pulse
+    MSDelay(1);
+    en = 0;
+}
+
+void lcddata(unsigned char value) {
+    lcd_data = value; // Send data
+    rs = 1;           // Data mode
+    rw = 0;           // Write mode
+    en = 1;           // Generate enable pulse
+    MSDelay(1);
+    en = 0;
+}
+
+void MSDelay(unsigned int iteam) {
+    unsigned int i, j;
+    for (i = 0; i < iteam; i++) {
+        for (j = 0; j < 100; j++); // Simple delay loop
+    }
+}

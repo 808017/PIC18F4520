@@ -1,0 +1,64 @@
+#include <p18f4520.h>
+#include <delays.h>
+
+// Configuration Bits
+#pragma config OSC = HS     // High-Speed Oscillator (20 MHz)
+#pragma config WDT = OFF    // Watchdog Timer Disabled
+#pragma config LVP = OFF    // Low Voltage Programming Disabled
+#pragma config PBADEN = OFF // PORTB Analog Inputs Disabled
+
+#define _XTAL_FREQ 20000000  // 20 MHz Crystal Frequency
+
+// Function Prototypes
+void PWM_Init(void);
+void SetDutyCycle(unsigned int duty);
+void delay_ms(unsigned int milliseconds);
+
+void main() {
+    PWM_Init(); // Initialize PWM
+
+    while (1) {
+        SetDutyCycle(256); // 25% Duty Cycle
+        delay_ms(600);
+
+        SetDutyCycle(512); // 50% Duty Cycle
+        delay_ms(50);
+
+        SetDutyCycle(768); // 75% Duty Cycle
+        delay_ms(200);
+
+        SetDutyCycle(1023); // 100% Duty Cycle
+        delay_ms(10);
+    }
+}
+
+// Initialize PWM on CCP1 (RC2)
+void PWM_Init(void) {
+    TRISCbits.TRISC2 = 0; // Set RC2 as Output (PWM Pin)
+    
+    // Configure CCP1 in PWM Mode
+    CCP1CON = 0b00001100; // PWM mode, P1A active high
+    
+    // Set Timer2 for PWM
+    T2CON = 0b00000101;   // Timer2 ON, Prescaler = 4
+    
+    // Set PWM frequency (Period)
+    PR2 = 124; // ~4 kHz PWM frequency (for 20 MHz clock)
+    
+    // Set initial duty cycle to 50%
+    CCPR1L = 62;  // (50% of PR2 value)
+}
+
+// Set PWM Duty Cycle (10-bit resolution)
+void SetDutyCycle(unsigned int duty) {
+    if (duty > 1023) duty = 1023; // Limit to 10-bit value
+    CCPR1L = duty >> 2;  // Upper 8-bits
+    CCP1CONbits.DC1B = duty & 0x03;  // Lower 2-bits
+}
+
+// Delay function for C18 (Replaces __delay_ms)
+void delay_ms(unsigned int milliseconds) {
+    while (milliseconds--) {
+        Delay10KTCYx(2);  // Adjusted for 20MHz Clock
+    }
+}
